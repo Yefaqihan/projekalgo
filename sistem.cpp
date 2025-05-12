@@ -4,6 +4,7 @@ using namespace std;
 
 const int MAX = 100;
 
+// string nya dirubah pakai char
 struct Servis {
     int id;
     string nama;
@@ -16,9 +17,3 @@ struct Servis {
 
 Servis dataServis[MAX];
 int jumlahData = 0;
-
-// Untuk linked list (Menu 2)
-struct Node {
-    Servis data;
-    Node* next;
-};
