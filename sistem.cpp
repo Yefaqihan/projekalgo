@@ -169,6 +169,150 @@ void cariByNama()
         cout << "Data dengan nama tersebut tidak ditemukan." << endl;
 }
 
+void hapusDataByID()
+{
+    if (kepala == nullptr)
+    {
+        cout << "Tidak ada data untuk dihapus." << endl;
+        return;
+    }
+
+    char idHapus[12];
+    cout << "Masukkan ID yang akan dihapus: ";
+    cin.ignore();
+    cin.getline(idHapus, 12);
+
+    Servis *bantu = kepala;
+    Servis *sebelum = nullptr;
+
+    while (bantu != nullptr && strcmp(bantu->id, idHapus) != 0)
+    {
+        sebelum = bantu;
+        bantu = bantu->next;
+    }
+
+    if (bantu == nullptr)
+    {
+        cout << "Data dengan ID tersebut tidak ditemukan." << endl;
+        return;
+    }
+
+    if (sebelum == nullptr)
+    {
+        // Hapus kepala
+        kepala = bantu->next;
+    }
+    else
+    {
+        // Hapus node di tengah/akhir
+        sebelum->next = bantu->next;
+    }
+
+    delete bantu;
+    cout << "Data berhasil dihapus dari list." << endl;
+
+    // Simpan perubahan ke file
+    FILE *serv = fopen("serv.dat", "wb");
+    if (serv == nullptr)
+    {
+        cout << "Gagal membuka file untuk menyimpan data." << endl;
+        return;
+    }
+
+    Servis *simpan = kepala;
+    while (simpan != nullptr)
+    {
+        fwrite(simpan, sizeof(Servis) - sizeof(Servis *), 1, serv);
+        simpan = simpan->next;
+    }
+
+    fclose(serv);
+}
+
+void updateStatusServis()
+{
+    if (kepala == nullptr)
+    {
+        cout << "Tidak ada data untuk diupdate." << endl;
+        return;
+    }
+
+    char idCari[12];
+    cout << "Masukkan ID pelanggan yang ingin diupdate statusnya: ";
+    cin.ignore();
+    cin.getline(idCari, 12);
+
+    Servis *bantu = kepala;
+    bool ditemukan = false;
+    while (bantu != nullptr)
+    {
+        if (strcmp(bantu->id, idCari) == 0)
+        {
+            cout << "Status saat ini: " << bantu->status << endl;
+            cout << "Masukkan status baru: ";
+            cin.getline(bantu->status, 15);
+            ditemukan = true;
+            break;
+        }
+        bantu = bantu->next;
+    }
+
+    if (!ditemukan)
+    {
+        cout << "Data dengan ID tersebut tidak ditemukan." << endl;
+        return;
+    }
+
+    // Tulis ulang ke file
+    FILE *serv = fopen("serv.dat", "wb");
+    if (serv == nullptr)
+    {
+        cout << "Gagal membuka file untuk menyimpan update." << endl;
+        return;
+    }
+
+    bantu = kepala;
+    while (bantu != nullptr)
+    {
+        fwrite(bantu, sizeof(Servis) - sizeof(Servis *), 1, serv);
+        bantu = bantu->next;
+    }
+
+    fclose(serv);
+    cout << "Status berhasil diupdate dan disimpan ke file." << endl;
+}
+
+void sortingByID()
+{
+    if (kepala == nullptr || kepala->next == nullptr)
+    {
+        cout << "Data terlalu sedikit untuk disorting." << endl;
+        return;
+    }
+
+    for (Servis *i = kepala; i != nullptr; i = i->next)
+    {
+        for (Servis *j = i->next; j != nullptr; j = j->next)
+        {
+            if (strcmp(i->id, j->id) > 0)
+            {
+                // Tukar semua data kecuali pointer next
+                Servis temp = *i;
+                *i = *j;
+                *j = temp;
+
+                // Kembalikan pointer next ke posisi semula
+                Servis *tempNext = i->next;
+                i->next = j->next;
+                j->next = tempNext;
+            }
+        }
+    }
+
+    cout << "Data berhasil diurutkan berdasarkan ID." << endl;
+}
+
+
 int main()
 {
     int pilihan;
@@ -203,13 +347,13 @@ int main()
             cariByNama();
             break;
         case 5:
-            cout << "Fitur belum dibuat";
+            hapusDataByID();
             break;
         case 6:
-            cout << "Fitur belum dibuat";
+            updateStatusServis();
             break;
         case 7:
-            cout << "Fitur belum dibuat";
+            sortingByID();
             break;
         case 0:
             cout << "Terima kasih. Keluar dari program." << endl;
