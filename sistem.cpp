@@ -53,6 +53,11 @@ void bacaFileKeList()
 
 void tampilkanData()
 {
+    if (kepala == nullptr)
+    {
+        cout << "Belum ada data servis yang tersimpan.\n";
+        return;
+    }
     cout << "\n=== Daftar Semua Data Servis HP ===" << endl;
     Servis *bantu = kepala;
     while (bantu != nullptr)
@@ -112,6 +117,11 @@ void tambahData()
 
 void cariByID()
 {
+    if (kepala == nullptr)
+    {
+        cout << "Belum ada data untuk dicari.\n";
+        return;
+    }
     char cari[12];
     cout << "Masukkan ID yang dicari: ";
     cin.ignore();
@@ -142,6 +152,12 @@ void cariByID()
 
 void cariByNama()
 {
+    if (kepala == nullptr)
+    {
+        cout << "Belum ada data untuk dicari.\n";
+        return;
+    }
+
     char cari[30];
     cout << "Masukkan Nama yang dicari: ";
     cin.ignore();
@@ -320,6 +336,7 @@ int main()
 
     do
     {
+        system("cls");
         cout << "\n===== MENU SERVIS HP =====" << endl;
         cout << "1. Tambah Data Servis" << endl;
         cout << "2. Tampilkan Semua Data" << endl;
@@ -361,6 +378,11 @@ int main()
         default:
             cout << "Pilihan tidak valid." << endl;
         }
+        
+        cout << "\nTekan Enter untuk kembali ke menu...";
+        cin.ignore();
+        cin.get();
+        
     } while (pilihan != 0);
 
     return 0;
