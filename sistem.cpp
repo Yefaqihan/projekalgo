@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
+// #include <fstream>
 
 using namespace std;
 
@@ -16,6 +17,7 @@ struct Servis
     Servis *next;
 };
 
+FILE *serv;
 Servis *kepala = nullptr;
 
 void tambahKeList(Servis *baru)
@@ -36,24 +38,25 @@ void tambahKeList(Servis *baru)
 
 void bacaFileKeList()
 {
-    FILE *serv = fopen("serv.dat", "rb");
+    serv = fopen("serv.dat", "rb");
     if (serv == nullptr)
         return;
 
-    Servis bantu;
-    while (fread(&bantu, sizeof(Servis) - sizeof(Servis *), 1, serv))
+    Servis temp;
+    while (fread(&temp, sizeof(Servis) - sizeof(Servis *), 1, serv))
     {
         Servis *baru = new Servis;
-        *baru = bantu;
+        *baru = temp;
         baru->next = nullptr;
         tambahKeList(baru);
     }
+
     fclose(serv);
 }
 
 void tampilkanData()
 {
-    if (kepala == nullptr)
+    if (kepala == NULL)
     {
         cout << "Belum ada data servis yang tersimpan.\n";
         return;
@@ -76,11 +79,11 @@ void tampilkanData()
 
 void tambahData()
 {
-    FILE *serv = fopen("serv.dat", "ab");
-    if (serv == nullptr)
+    serv = fopen("serv.dat", "ab");
+    if (serv == NULL)
     {
         cout << "Error membuka file!" << endl;
-        exit(1);
+        return;
     }
 
     int tambah;
@@ -92,20 +95,20 @@ void tambahData()
     {
         Servis *baru = new Servis;
 
-        cout << "\nDaftar Data Servis ke-" << i + 1 << endl;
-        cout << "ID Pelanggan : ";
+        cout << "\nData Servis ke-" << i + 1 << endl;
+        cout << "ID Pelanggan     : ";
         cin.getline(baru->id, 12);
-        cout << "Nama Pelanggan : ";
+        cout << "Nama Pelanggan   : ";
         cin.getline(baru->nama, 30);
-        cout << "Nomor HP : ";
+        cout << "Nomor HP         : ";
         cin.getline(baru->noHP, 15);
-        cout << "Tipe HP Pelanggan : ";
+        cout << "Tipe HP          : ";
         cin.getline(baru->tipeHP, 20);
-        cout << "Jenis Kerusakan : ";
+        cout << "Jenis Kerusakan  : ";
         cin.getline(baru->kerusakan, 15);
-        cout << "Status Servis : ";
+        cout << "Status Servis    : ";
         cin.getline(baru->status, 15);
-        cout << "Estimasi Biaya : ";
+        cout << "Estimasi Biaya   : ";
         cin.getline(baru->estimasiBiaya, 20);
 
         fwrite(baru, sizeof(Servis) - sizeof(Servis *), 1, serv);
@@ -113,6 +116,8 @@ void tambahData()
     }
 
     fclose(serv);
+
+    cout << "Data servis telah berhasil ditambahkan";
 }
 
 void cariByID()
@@ -122,32 +127,30 @@ void cariByID()
         cout << "Belum ada data untuk dicari.\n";
         return;
     }
+
     char cari[12];
-    cout << "Masukkan ID yang dicari: ";
     cin.ignore();
+    cout << "Masukkan ID yang dicari: ";
     cin.getline(cari, 12);
 
     Servis *bantu = kepala;
-    bool ditemukan = false;
     while (bantu != nullptr)
     {
         if (strcmp(bantu->id, cari) == 0)
         {
-            cout << "Data ditemukan:" << endl;
+            cout << "\nData ditemukan:\n";
             cout << "Nama Pelanggan  : " << bantu->nama << endl;
             cout << "Nomor HP        : " << bantu->noHP << endl;
             cout << "Tipe HP         : " << bantu->tipeHP << endl;
             cout << "Kerusakan       : " << bantu->kerusakan << endl;
             cout << "Status          : " << bantu->status << endl;
             cout << "Estimasi Biaya  : " << bantu->estimasiBiaya << endl;
-            ditemukan = true;
-            break;
+            return;
         }
         bantu = bantu->next;
     }
 
-    if (!ditemukan)
-        cout << "Data dengan ID tersebut tidak ditemukan." << endl;
+    cout << "Data dengan ID tersebut tidak ditemukan.\n";
 }
 
 void cariByNama()
@@ -159,8 +162,8 @@ void cariByNama()
     }
 
     char cari[30];
-    cout << "Masukkan Nama yang dicari: ";
     cin.ignore();
+    cout << "Masukkan Nama yang dicari: ";
     cin.getline(cari, 30);
 
     Servis *bantu = kepala;
@@ -182,20 +185,20 @@ void cariByNama()
     }
 
     if (!ditemukan)
-        cout << "Data dengan nama tersebut tidak ditemukan." << endl;
+        cout << "Data dengan nama tersebut tidak ditemukan.\n";
 }
 
 void hapusDataByID()
 {
     if (kepala == nullptr)
     {
-        cout << "Tidak ada data untuk dihapus." << endl;
+        cout << "Tidak ada data untuk dihapus.\n";
         return;
     }
 
     char idHapus[12];
-    cout << "Masukkan ID yang akan dihapus: ";
     cin.ignore();
+    cout << "Masukkan ID yang akan dihapus: ";
     cin.getline(idHapus, 12);
 
     Servis *bantu = kepala;
@@ -209,100 +212,90 @@ void hapusDataByID()
 
     if (bantu == nullptr)
     {
-        cout << "Data dengan ID tersebut tidak ditemukan." << endl;
+        cout << "Data tidak ditemukan.\n";
         return;
     }
 
     if (sebelum == nullptr)
     {
-        // Hapus kepala
         kepala = bantu->next;
     }
     else
     {
-        // Hapus node di tengah/akhir
         sebelum->next = bantu->next;
     }
 
     delete bantu;
-    cout << "Data berhasil dihapus dari list." << endl;
+    cout << "Data berhasil dihapus dari list.\n";
 
-    // Simpan perubahan ke file
-    FILE *serv = fopen("serv.dat", "wb");
-    if (serv == nullptr)
+    FILE *file = fopen("serv.dat", "wb");
+    if (file == nullptr)
     {
-        cout << "Gagal membuka file untuk menyimpan data." << endl;
+        cout << "Gagal menyimpan perubahan ke file.\n";
         return;
     }
 
     Servis *simpan = kepala;
     while (simpan != nullptr)
     {
-        fwrite(simpan, sizeof(Servis) - sizeof(Servis *), 1, serv);
+        fwrite(simpan, sizeof(Servis) - sizeof(Servis *), 1, file);
         simpan = simpan->next;
     }
 
-    fclose(serv);
+    fclose(file);
 }
 
 void updateStatusServis()
 {
     if (kepala == nullptr)
     {
-        cout << "Tidak ada data untuk diupdate." << endl;
+        cout << "Tidak ada data untuk diupdate.\n";
         return;
     }
 
     char idCari[12];
-    cout << "Masukkan ID pelanggan yang ingin diupdate statusnya: ";
     cin.ignore();
+    cout << "Masukkan ID pelanggan yang ingin diupdate: ";
     cin.getline(idCari, 12);
 
     Servis *bantu = kepala;
-    bool ditemukan = false;
     while (bantu != nullptr)
     {
         if (strcmp(bantu->id, idCari) == 0)
         {
-            cout << "Status saat ini: " << bantu->status << endl;
+            cout << "Status lama: " << bantu->status << endl;
             cout << "Masukkan status baru: ";
             cin.getline(bantu->status, 15);
-            ditemukan = true;
-            break;
+
+            FILE *file = fopen("serv.dat", "wb");
+            if (file == nullptr)
+            {
+                cout << "Gagal menyimpan perubahan ke file.\n";
+                return;
+            }
+
+            Servis *simpan = kepala;
+            while (simpan != nullptr)
+            {
+                fwrite(simpan, sizeof(Servis) - sizeof(Servis *), 1, file);
+                simpan = simpan->next;
+            }
+            fclose(file);
+
+            cout << "Status berhasil diperbarui.\n";
+            return;
         }
         bantu = bantu->next;
     }
 
-    if (!ditemukan)
-    {
-        cout << "Data dengan ID tersebut tidak ditemukan." << endl;
-        return;
-    }
-
-    // Tulis ulang ke file
-    FILE *serv = fopen("serv.dat", "wb");
-    if (serv == nullptr)
-    {
-        cout << "Gagal membuka file untuk menyimpan update." << endl;
-        return;
-    }
-
-    bantu = kepala;
-    while (bantu != nullptr)
-    {
-        fwrite(bantu, sizeof(Servis) - sizeof(Servis *), 1, serv);
-        bantu = bantu->next;
-    }
-
-    fclose(serv);
-    cout << "Status berhasil diupdate dan disimpan ke file." << endl;
+    cout << "Data tidak ditemukan.\n";
 }
 
 void sortingByID()
 {
     if (kepala == nullptr || kepala->next == nullptr)
     {
-        cout << "Data terlalu sedikit untuk disorting." << endl;
+        cout << "Tidak cukup data untuk disorting.\n";
         return;
     }
 
@@ -312,22 +305,14 @@ void sortingByID()
         {
             if (strcmp(i->id, j->id) > 0)
             {
-                // Tukar semua data kecuali pointer next
-                Servis temp = *i;
-                *i = *j;
-                *j = temp;
-
-                // Kembalikan pointer next ke posisi semula
-                Servis *tempNext = i->next;
-                i->next = j->next;
-                j->next = tempNext;
+                swap(*i, *j);
+                swap(i->next, j->next); // kembalikan pointer next
             }
         }
     }
 
-    cout << "Data berhasil diurutkan berdasarkan ID." << endl;
+    cout << "Data berhasil diurutkan berdasarkan ID.\n";
 }
-
 
 int main()
 {
@@ -337,15 +322,15 @@ int main()
     do
     {
         system("cls");
-        cout << "\n===== MENU SERVIS HP =====" << endl;
-        cout << "1. Tambah Data Servis" << endl;
-        cout << "2. Tampilkan Semua Data" << endl;
-        cout << "3. Cari Data by ID" << endl;
-        cout << "4. Cari Data by Nama" << endl;
+        cout << "\n===== MENU SERVIS HP =====\n";
+        cout << "1. Tambah Data Servis\n";
+        cout << "2. Tampilkan Semua Data\n";
+        cout << "3. Cari Data by ID\n";
+        cout << "4. Cari Data by Nama\n";
         cout << "5. Hapus Data Servis\n";
         cout << "6. Update Status Servis\n";
         cout << "7. Sorting Data by ID\n";
-        cout << "0. Keluar" << endl;
+        cout << "0. Keluar\n";
         cout << "Pilihan Anda: ";
         cin >> pilihan;
 
@@ -373,16 +358,16 @@ int main()
             sortingByID();
             break;
         case 0:
-            cout << "Terima kasih. Keluar dari program." << endl;
+            cout << "Terima kasih. Keluar dari program.\n";
             break;
         default:
-            cout << "Pilihan tidak valid." << endl;
+            cout << "Pilihan tidak valid.\n";
         }
         
-        cout << "\nTekan Enter untuk kembali ke menu...";
+        cout << "Tekan enter untuk kembali ke menu.....";
         cin.ignore();
         cin.get();
-        
+
     } while (pilihan != 0);
 
     return 0;
