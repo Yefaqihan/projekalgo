@@ -1,7 +1,8 @@
+// Jika tidak bisa run atau ada masalah saat run di VSCode, coba run di exe nya
+
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
-// #include <fstream>
 
 using namespace std;
 
@@ -19,6 +20,21 @@ struct Servis
 
 FILE *serv;
 Servis *kepala = nullptr;
+
+bool cekID(const char* cek)
+{
+    Servis* bantu = kepala;
+    while (bantu != nullptr)
+    {
+        if (strcmp(bantu->id, cek) == 0)
+        {
+            return true; 
+        }
+        bantu = bantu->next;
+    }
+    return false; 
+}
+
 
 void tambahKeList(Servis *baru)
 {
@@ -96,8 +112,16 @@ void tambahData()
         Servis *baru = new Servis;
 
         cout << "\nData Servis ke-" << i + 1 << endl;
-        cout << "ID Pelanggan     : ";
-        cin.getline(baru->id, 12);
+        do
+        {
+            cout << "ID Pelanggan     : ";
+            cin.getline(baru->id, 12);
+
+            if (cekID(baru->id))
+            {
+                cout << "ID sudah digunakan, masukkan ID yang lain.\n";
+            }
+        } while (cekID(baru->id));
         cout << "Nama Pelanggan   : ";
         cin.getline(baru->nama, 30);
         cout << "Nomor HP         : ";
@@ -306,7 +330,7 @@ void sortingByID()
             if (strcmp(i->id, j->id) > 0)
             {
                 swap(*i, *j);
-                swap(i->next, j->next); // kembalikan pointer next
+                swap(i->next, j->next);
             }
         }
     }
@@ -363,7 +387,7 @@ int main()
         default:
             cout << "Pilihan tidak valid.\n";
         }
-        
+
         cout << "Tekan enter untuk kembali ke menu.....";
         cin.ignore();
         cin.get();
